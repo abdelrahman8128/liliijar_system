@@ -1,0 +1,49 @@
+abstract class States{}
+
+class InitialState extends States{}
+
+class ImagePickSuccess extends States{}
+
+class ImagePickLoading extends States{}
+
+class ImagePickFailed extends States{}
+
+class GetProductsSuccess extends States{}
+
+class GetProductsLoading extends States{}
+
+class GetProductsFailed extends States{}
+
+
+class GetProductSuccess extends States{}
+
+class GetProductLoading extends States{}
+
+class GetProductFailed extends States{}
+
+
+
+class GetCategoriesSuccess extends States{}
+
+class GetCategoriesLoading extends States{}
+
+class GetCategoriesFailed extends States{}
+
+class SearchProductsSuccess extends States{}
+
+class SearchProductsLoading extends States{}
+
+class SearchProductsFailed extends States{}
+
+
+class AddCategorySuccess extends States{}
+
+class AddCategoryLoading extends States{}
+
+class AddCategoryFailed extends States{}
+
+class EditCategorySuccess extends States{}
+
+class EditCategoryLoading extends States{}
+
+class EditCategoryFailed extends States{}
