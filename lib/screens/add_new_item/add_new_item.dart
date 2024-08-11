@@ -20,7 +20,9 @@ class _AddNewItemState extends State<AddNewItem> {
   @override
   void initState() {
     super.initState();
+    cubit.get(context).images.clear();
     cubit.get(context).getCategories();
+
 
 
 
@@ -33,7 +35,6 @@ class _AddNewItemState extends State<AddNewItem> {
   var productPriceController = TextEditingController();
   var productTermsController = TextEditingController();
   var productCategoryIDController = TextEditingController();
-  var productRatingController = TextEditingController();
 
 
   @override
@@ -72,12 +73,7 @@ class _AddNewItemState extends State<AddNewItem> {
                           border: OutlineInputBorder(),
                         ),
                         maxLines: 5,
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Please enter product description';
-                          }
-                          return null;
-                        },
+
                       ),
                       SizedBox(height: 20),
                       TextFormField(
@@ -104,28 +100,10 @@ class _AddNewItemState extends State<AddNewItem> {
                           labelText: 'Product Terms',
                           border: OutlineInputBorder(),
                         ),
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Please enter product terms';
-                          }
-                          return null;
-                        },
+
                       ),
                       SizedBox(height: 20),
-                      TextFormField(
-                        controller: productRatingController,
-                        decoration: InputDecoration(
-                          labelText: 'Product Rating out of five',
-                          border: OutlineInputBorder(),
-                        ),
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Please enter product Rating';
-                          }
-                          return null;
-                        },
-                      ),
-                      SizedBox(height: 20),
+
                       DropdownButtonFormField<CategoryModel>(
                         items: cubit.get(context).categories.map<DropdownMenuItem<CategoryModel>>(
                                 (value) {
@@ -186,7 +164,7 @@ class _AddNewItemState extends State<AddNewItem> {
                       return Container(
                         decoration: BoxDecoration(
                           image: DecorationImage(
-                            image: FileImage(cubit.get(context).images[index]),
+                            image: NetworkImage(cubit.get(context).images[index]),
                             fit: BoxFit.cover,
                           ),
                           borderRadius: BorderRadius.circular(25),
@@ -204,20 +182,17 @@ class _AddNewItemState extends State<AddNewItem> {
                     // Add product to database or API call
 
 
+                    cubit.get(context).addProduct(ProductModel(
+                        title: productTitleController.text,
+                        coverImage: cubit.get(context).images.first,
+                        description: productDescriptionController.text,
+                        images: cubit.get(context).images,
+                        price: int.parse(productPriceController.text),
+                        occupied: [],
+                        terms: productTermsController.text,
+                        categoryID: productCategoryIDController.text
 
-                    dbInsert('products',ProductModel(
-                      title: productTitleController.text,
-                      coverImage: null,
-                      description: productDescriptionController.text,
-                      images: ['https://m.media-amazon.com/images/I/315T7v237UL._AC_.jpg','https://m.media-amazon.com/images/I/71gLZXxH24L._AC_SX569_.jpg',],
-                      price: int.parse(productPriceController.text),
-                      rating: productRatingController.text,
-                      occupied: [],
-                      terms: productTermsController.text,
-                      categoryID: productCategoryIDController.text
-
-                    ).toMap());
-
+                    ));
 
                   }
                 },

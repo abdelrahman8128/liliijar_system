@@ -1,3 +1,4 @@
+import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -19,7 +20,6 @@ class _EditItemState extends State<EditItem> {
   var productDescriptionController = TextEditingController();
   var productPriceController = TextEditingController();
   var productTermsController = TextEditingController();
-  var productRatingController = TextEditingController();
   var productCategoryIDController = TextEditingController();
 
   List<Widget> occupiedDays = [];
@@ -28,7 +28,9 @@ class _EditItemState extends State<EditItem> {
   void initState() {
     super.initState();
 
+
     cubit.get(context).getCategories();
+    cubit.get(context).images.clear();
 
     productTitleController =
         TextEditingController(text: cubit.get(context).product.title);
@@ -41,7 +43,6 @@ class _EditItemState extends State<EditItem> {
     productCategoryIDController =
         TextEditingController(text: cubit.get(context).product.categoryID.toString());
 
-     productRatingController = TextEditingController(text: cubit.get(context).product.rating.toString());
 
     cubit.get(context).product.occupied.forEach((day){
       occupiedDays.add(Padding(
@@ -136,25 +137,14 @@ class _EditItemState extends State<EditItem> {
                             return null;
                           },
                         ),
-                        SizedBox(height: 20),
-                        TextFormField(
-                          controller: productRatingController,
-                          decoration: InputDecoration(
-                            labelText: 'Product Rating out of five',
-                            border: OutlineInputBorder(),
-                          ),
-                          validator: (value) {
-                            if (value!.isEmpty) {
-                              return 'Please enter product terms';
-                            }
-                            return null;
-                          },
-                        ),
+
                         SizedBox(height: 20),
                         DropdownButtonFormField<CategoryModel>(
 
+
                           items: cubit.get(context).categories.map<DropdownMenuItem<CategoryModel>>(
                                   (value) {
+
                                 return DropdownMenuItem<CategoryModel>(
                                   value: value,
                                   child: Text(value.title??''),
@@ -163,12 +153,8 @@ class _EditItemState extends State<EditItem> {
                           // decoration:,
                           // style: ,
 
-                          validator: (value) {
-                            if (value == null) {
-                              return 'please choose the category';
-                            }
-                            return null;
-                          },
+
+
                           onChanged: (value) {
                             productCategoryIDController.text = '${value?.id??''}';
                           },
@@ -178,42 +164,76 @@ class _EditItemState extends State<EditItem> {
                         SizedBox(height: 20),
 
 
-                        DateRangePickerScreen(),
 
 
-
-                        // ListView.builder(
-                        //   physics: BouncingScrollPhysics(),
-                        //   shrinkWrap: true,
-                        //   scrollDirection: Axis.vertical,
-                        //
-                        //   itemCount: occupiedDays.length,
-                        //   itemBuilder: (context, index) {
-                        //     return occupiedDays[index];
-                        //   },
-                        // ),
-                        // ElevatedButton(
-                        //   onPressed: () {
-                        //     occupiedDays.add(
-                        //       Padding(
-                        //         padding: const EdgeInsets.all(8.0),
-                        //         child: TextFormField(
-                        //           decoration: InputDecoration(
-                        //             labelText: 'Enter text',
-                        //             border: OutlineInputBorder(),
-                        //           ),
-                        //         ),
-                        //       ),
-                        //     );
-                        //     setState(() {
-                        //
-                        //     });
-                        //   },
-                        //   child: Text('Add TextFormField'),
-                        // ),
                       ],
                     ),
                   ),
+                ),
+            GridView.builder(
+              shrinkWrap: true,
+              physics: BouncingScrollPhysics(),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+              ),
+              itemCount: cubit.get(context).product.images.length,
+              itemBuilder: (context, index) {
+                return Container(
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: NetworkImage(cubit.get(context).product.images[index]),
+                      fit: BoxFit.cover,
+                    ),
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                );
+              },
+            ),
+                ElevatedButton(
+                  onPressed: cubit.get(context).pickImages,
+                  child: Text(
+                    'Pick Imaged',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20),
+                ConditionalBuilder(
+                  condition:
+                  state is ImagePickLoading || state is ImagePickFailed,
+                  builder: (context) {
+                    return Center(child: CircularProgressIndicator());
+                  },
+                  fallback: (context) {
+                    return GridView.builder(
+                      shrinkWrap: true,
+                      physics: BouncingScrollPhysics(),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 10,
+                        mainAxisSpacing: 10,
+                      ),
+                      itemCount: cubit.get(context).images.length,
+                      itemBuilder: (context, index) {
+                        return Container(
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: NetworkImage(cubit.get(context).images[index]),
+                              fit: BoxFit.cover,
+                            ),
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                        );
+                      },
+                    );
+                  },
                 ),
                 SizedBox(height: 20),
                 ElevatedButton(
@@ -222,17 +242,16 @@ class _EditItemState extends State<EditItem> {
                       _formKey.currentState!.save();
                       // Add product to database or API call
 
-                      dbUpdateColumn(
+                      dbUpdate(
                           modelName: 'products',
                           id: cubit.get(context).product.id!,
                           updates: ProductModel(
                             title: productTitleController.text,
-                            coverImage: null,
+                            coverImage: cubit.get(context).product.images.first,
                             description: productDescriptionController.text,
-                            images: ['', '', ''],
+                            images: cubit.get(context).product.images+cubit.get(context).images,
                             price: int.parse(productPriceController.text),
-                            rating: productRatingController.text,
-                            occupied: [],
+                            occupied: cubit.get(context).product.occupied,
                             terms: productTermsController.text,
                             categoryID: productCategoryIDController.text
                           ).toMap(),

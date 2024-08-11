@@ -125,18 +125,6 @@ class _ItemProfileState extends State<ItemProfile> {
                               FontWeight.bold,),
                             ),
                             SizedBox(height: 10,),
-                            Text('Condition',style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18
-
-                            ),),
-                            Row(
-                              children: [
-                                Icon(Icons.star, color: Colors.yellow),
-                                Text(((cubit.get(context).product.rating??'0.0').toString())),
-                              ],
-                            ),
-                            SizedBox(height: 10,),
 
                             Text('Description',
                               style: TextStyle(

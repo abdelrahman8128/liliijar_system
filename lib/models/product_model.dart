@@ -5,7 +5,6 @@ class ProductModel {
   String? coverImage='https://st4.depositphotos.com/14953852/24787/v/450/depositphotos_247872612-stock-illustration-no-image-available-icon-vector.jpg';
   String? terms;
   int? price;
-  var rating;
   List<dynamic> images = ['https://st4.depositphotos.com/14953852/24787/v/450/depositphotos_247872612-stock-illustration-no-image-available-icon-vector.jpg'];
   List<DateTime> occupied = [];
   int ?categoryID;
@@ -18,7 +17,6 @@ class ProductModel {
     var coverImage='https://st4.depositphotos.com/14953852/24787/v/450/depositphotos_247872612-stock-illustration-no-image-available-icon-vector.jpg',
     int? price,
     String? terms,
-    var rating,
     List<DateTime> occupied=const[],
     String ?categoryID,
   }) {
@@ -28,7 +26,6 @@ class ProductModel {
     this.coverImage = coverImage;
     this.price = price;
     this.terms = terms;
-    this.rating = rating;
     this.occupied = occupied;
     this.categoryID=int.parse(categoryID??'0');
   }
@@ -40,7 +37,6 @@ class ProductModel {
     this.coverImage = json?['coverImage'];
     this.price = json?['price'];
     this.terms = json?['terms'];
-    this.rating = json?['rating'];
     this.categoryID=json?['categoryID'];
 
     try{
@@ -64,6 +60,12 @@ class ProductModel {
   }
 
   Map<String, dynamic> toMap() {
+
+    List<String>occ=[];
+    occupied.forEach((day){
+      occ.add(day.toString());
+    });
+
     return {
       'title': title,
       'description': description,
@@ -71,8 +73,8 @@ class ProductModel {
       'coverImage': coverImage,
       'price': price,
       'terms': terms,
-      'rating': rating,
-      'occupied': occupied,
+
+      'occupied': occ,
       'categoryID':categoryID,
     };
   }

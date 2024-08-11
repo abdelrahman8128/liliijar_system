@@ -1,8 +1,10 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:liliijar_system/models/request_model.dart';
 import '../../cubit/states.dart';
 import '../../db/db.dart';
 import '../../screens/add_new_item/add_new_item.dart';
@@ -11,12 +13,12 @@ import '../../screens/home/home_screen.dart';
 import '../models/category_model.dart';
 import '../models/product_model.dart';
 import '../screens/categories/Categories_Screen.dart';
-
+import 'package:http/http.dart' as http;
 class cubit extends Cubit<States>{
   cubit(): super(InitialState()) ;
   static cubit get(context)=>BlocProvider.of(context);
 
-  List<File> images = [];
+  List<String> images = [];
   final picker = ImagePicker();
 
   int screenIndex=2;
@@ -29,6 +31,7 @@ class cubit extends Cubit<States>{
 
   List<CategoryModel>categories=[];
   List<ProductModel>products=[];
+  List<RequestModel>requests=[];
   ProductModel product=ProductModel();
 
 
@@ -42,9 +45,14 @@ class cubit extends Cubit<States>{
 
       if (pickedFiles != null) {
 
-        images =
-            pickedFiles.map((pickedFile) => File(pickedFile.path)).toList();
-        emit(ImagePickSuccess());
+          pickedFiles.map((pickedFile) => File(pickedFile.path))
+            .forEach((img) async {
+
+              await uploadImage(img);
+
+              emit(ImagePickSuccess());
+          });
+
       } else {
 
         emit(ImagePickFailed());
@@ -149,12 +157,25 @@ class cubit extends Cubit<States>{
    }
 
   }
+  Future<void> addProduct(ProductModel model) async {
+
+   emit(AddProductLoading());
+   try {
+      var data = await dbInsert('products', model.toMap());
+      emit(AddProductSuccess());
+   }
+   catch(err){
+     print (err);
+     emit(AddProductFailed());
+   }
+
+  }
 
   Future<void> editCategory(int id,String title) async {
 
    emit(EditCategoryLoading());
    try {
-      var data = await dbUpdateColumn(
+      var data = await dbUpdate(
           modelName: 'categories',
           updates:  {
             "title": title,
@@ -169,5 +190,95 @@ class cubit extends Cubit<States>{
    }
 
   }
+
+  void getRequests() async{
+    print('ya mosahel');
+    requests.clear();
+    emit(GetRequestsLoading());
+    try {
+       await dbGetAll(modelName: "requests", ).then((data) async {
+          data.forEach((item)   async {
+           var request=RequestModel.fromJson(item);
+
+           await dbGetOne(modelName: 'products', id: request.productID!,columns: 'title')
+               .then((onValue){
+             request.productName=onValue['title'];
+             requests.add(request);
+           });
+
+           emit(GetRequestsSuccess());
+         });
+       }
+
+    );
+
+
+
+      print('done');
+
+
+    }
+    catch(err){
+      emit(GetRequestsFailed());
+      // print('a7a');
+      print (err.toString());
+    }
+    
+  }
+
+  Future<void> confirmRequest(RequestModel model) async {
+    emit(ConfirmRequestsLoading());
+    try{
+      var data = await dbGetOne(modelName: 'products', id: model.productID!);
+      var requestProduct = ProductModel.fromJson(data);
+      model.days.forEach((item){
+        requestProduct.occupied.add(DateTime.parse(item));
+      });
+      data = await dbUpdate(
+          modelName: 'products',
+          id: requestProduct.id!,
+          updates: requestProduct.toMap());
+      await dbDeleteItem(modelName: 'requests', id: model.id!)
+          .then((onValue){
+
+          });
+    emit(ConfirmRequestsSuccess());
+    }
+    catch(err){
+      print (err);
+      emit(ConfirmRequestsFailed());
+
+    }
+
+  }
+
+  Future<void> uploadImage(imageFile)
+  async {
+   try {
+      final bytes = await imageFile.readAsBytes();
+      final base64Image = base64Encode(bytes);
+
+      // Create POST request
+      final response = await http.post(
+        Uri.parse(
+            'https://api.imgbb.com/1/upload?key=79f32ff29415bd27bd80c85ab32e53b2'),
+        body: {
+          'image': base64Image,
+        },
+      ).then((onValue){
+        if(onValue.statusCode==200) {
+          print('shagalaa');
+          print(jsonDecode(onValue.body)['data']['display_url']);
+
+          images.add(jsonDecode(onValue.body)['data']['display_url']);
+        }
+      });
+    }
+    catch(err){
+     print ('bazet khales');
+     print (err.toString());
+    }
+  }
+
 
 }

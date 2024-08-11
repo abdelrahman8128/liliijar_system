@@ -31,17 +31,17 @@ Future dbGetAll({required String modelName, String columns = '*'}) async {
   return data;
 }
 
-Future dbGetOne({required String modelName,required int id}) async {
+Future dbGetOne({required String modelName,required int id,String columns='*'}) async {
   var data =await supabase
       .from(modelName)
-      .select('*')
+      .select(columns)
       .eq('id', id)
       .single();
 
   return data;
 }
 
-Future dbUpdateColumn({required String modelName, required int id, required updates})
+Future dbUpdate({required String modelName, required int id, required updates})
 async{
   var data=await supabase
       .from(modelName)

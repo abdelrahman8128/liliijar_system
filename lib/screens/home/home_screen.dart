@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../cubit/cubit.dart';
 import '../../cubit/states.dart';
-import '../../shared/item_builder.dart';
+import '../itemProfile/item_builder.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -65,7 +65,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   imageUrl: cubit.get(context).products[index].coverImage,
                   price: cubit.get(context).products[index].price,
                   title: cubit.get(context).products[index].title,
-                  rating: cubit.get(context).products[index].rating,
 
                 );
               },

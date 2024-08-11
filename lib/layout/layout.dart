@@ -5,6 +5,7 @@ import 'package:navigation_view/item_navigation_view.dart';
 import 'package:navigation_view/navigation_view.dart';
 import '../cubit/cubit.dart';
 import '../cubit/states.dart';
+import '../screens/requests/requests.dart';
 
 class Layout extends StatefulWidget {
   @override
@@ -23,6 +24,15 @@ class _LayoutState extends State<Layout> {
             appBar: AppBar(
               backgroundColor: Colors.white,
               elevation: 0,
+              actions: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: IconButton(onPressed: () {
+
+                    Navigator.push(context, DialogRoute(context: context, builder: (context) => Requests(),));
+                  }, icon: Icon(Icons.notifications_active_rounded)),
+                )
+              ],
               title: const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.0),
                 child: Row(

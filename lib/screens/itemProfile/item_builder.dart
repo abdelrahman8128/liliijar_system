@@ -2,21 +2,19 @@ import 'package:blurrycontainer/blurrycontainer.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../screens/itemProfile/itemProfileScreen.dart';
+import 'itemProfileScreen.dart';
 
 class ItemBuilder extends StatelessWidget {
    int? id;
    String? imageUrl;
    String?title=' ';
    int ?price;
-   var  rating='';
 
   ItemBuilder({
      this.id,
      this.imageUrl,
      this.title,
      this.price,
-    required rating,
   });
 
   @override
@@ -68,34 +66,6 @@ class ItemBuilder extends StatelessWidget {
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),
-                ),
-              ),
-            ),
-            Positioned(
-              top: 10,
-              right: 10,
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  children: <Widget>[
-                    Icon(
-                      Icons.star,
-                      color: Colors.yellow,
-                      size: 16,
-                    ),
-                    SizedBox(width: 4),
-                    Text(
-                      rating??'',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.green[700],
-                      ),
-                    ),
-                  ],
                 ),
               ),
             ),

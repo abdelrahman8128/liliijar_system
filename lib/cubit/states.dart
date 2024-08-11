@@ -29,6 +29,8 @@ class GetCategoriesLoading extends States{}
 
 class GetCategoriesFailed extends States{}
 
+
+
 class SearchProductsSuccess extends States{}
 
 class SearchProductsLoading extends States{}
@@ -42,8 +44,36 @@ class AddCategoryLoading extends States{}
 
 class AddCategoryFailed extends States{}
 
+
+
+
+class AddProductSuccess extends States{}
+
+class AddProductLoading extends States{}
+
+class AddProductFailed extends States{}
+
+
+
+
 class EditCategorySuccess extends States{}
 
 class EditCategoryLoading extends States{}
 
 class EditCategoryFailed extends States{}
+
+
+
+class GetRequestsSuccess extends States{}
+
+class GetRequestsLoading extends States{}
+
+class GetRequestsFailed extends States{}
+
+
+class ConfirmRequestsSuccess extends States{}
+
+class ConfirmRequestsLoading extends States{}
+
+class ConfirmRequestsFailed extends States{}
+
